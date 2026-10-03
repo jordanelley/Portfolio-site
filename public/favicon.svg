@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+  <rect width="48" height="48" rx="12" fill="#aa3bff" />
+  <text
+    x="50%"
+    y="54%"
+    text-anchor="middle"
+    dominant-baseline="middle"
+    font-family="system-ui, sans-serif"
+    font-size="22"
+    font-weight="600"
+    fill="#fff"
+  >
+    YN
+  </text>
+</svg>
