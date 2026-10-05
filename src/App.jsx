@@ -82,6 +82,17 @@ const experience = [
       'Set up study sessions on the most-requested exam topics',
     ],
   },
+  {
+    role: 'Software Developer Intern',
+    company: 'Pingar',
+    duration: '1 yr',
+    points: [
+      'Text analytics software',
+      'Automated most of the manual testing using Selenium',
+      'Set up deployment pipelines using Jenkins',
+      'General maintenance on Front end using JS, CSS and HTML'
+    ],
+  }
 ]
 
 const projects = [
