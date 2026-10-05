@@ -45,7 +45,6 @@ const experience = [
     logo: zipLogo,
     points: [
       'Digital Finacial Services Software',
-      'Worked in .NET Core using event-driven architecture',
       'Maintained and built services on a .NET core system designed with event-driven architecture',
       'Unit tested in NUnit',
       'Used EventStoreDB for event sourcing',
