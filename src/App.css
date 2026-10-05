@@ -52,6 +52,8 @@ section {
   justify-content: space-between;
   gap: 48px;
   text-align: left;
+  max-width: 1200px;
+  margin: 0 auto;
   padding-top: 120px;
   padding-bottom: 120px;
   padding-right: 120px;
