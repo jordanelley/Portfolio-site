@@ -3,6 +3,8 @@ import './App.css'
 import MatrixIntro from './MatrixIntro.jsx'
 import CodeTyper from './CodeTyper.jsx'
 import Lightbox from './Lightbox.jsx'
+import FizzBuzzBox from './FizzBuzzBox.jsx'
+import WordArtTitle from './WordArtTitle.jsx'
 import meImage from './images/me.png'
 import aboutPhoto1 from './images/about/2F519E8F-FA1A-483A-B309-621A4864C63F.JPG'
 import aboutPhoto2 from './images/about/IMG_7277.jpg'
@@ -12,7 +14,9 @@ import experiencePhoto2 from './images/experience/experience-2.png'
 import zipLogo from './images/zip-logo.avif'
 import pokeordleImage from './images/pokeordle.png'
 import vertigoImage from './images/Vertigo.png'
+import garminImage from './images/Garmin-audit.png'
 import badUiImage from './images/bad-ui.PNG'
+import badUiImage2 from './images/bad-ui-2.jpg'
 
 const aboutPhotos = [
   { src: aboutPhoto1, alt: 'Mountain biking at the top of a trail', label: 'Hard Working', labelSize: 40 },
@@ -28,14 +32,25 @@ const currentYear = new Date().getFullYear()
 const experience = [
   {
     role: 'Software Engineer',
+    company: 'Queenstown Community Tech Lab',
+    duration: 'Currently working on',
+    points: [
+      'Collaborating with the Queenstown MTB club to make a software to make auditing the trails less manual',
+    ],
+  },
+  {
+    role: 'Software Engineer',
     company: 'Zip Co',
     duration: '1 yr 3 mos',
     logo: zipLogo,
     points: [
+      'Digital Finacial Services Software',
       'Worked in .NET Core using event-driven architecture',
+      'Maintained and built services on a .NET core system designed with event-driven architecture',
       'Unit tested in NUnit',
       'Used EventStoreDB for event sourcing',
-      'Maintained the front end in AngularJS',
+      'Built features on the web app using Angular and Typescript',
+      'Maintained the mobile app in Flutter'
     ],
   },
   {
@@ -43,8 +58,8 @@ const experience = [
     company: 'Code First Girls',
     duration: '2 yrs',
     points: [
-      'Teach 8-week courses online in Python and web development',
-      'Assisted teaching in-person courses at Girl Code',
+      'Charity offering free online courses for Tech',
+      'Taught 8-week courses online in Python, Web Development and SQL',
     ],
   },
   {
@@ -52,10 +67,11 @@ const experience = [
     company: 'MYOB',
     duration: '3 yrs',
     points: [
-      'Worked in React and .NET Core',
+      'Cloud Platform for accountants and book keepers to interact with businesses',
+      'Fullstack using React and .NET Core',
       'Unit tested with Jest & Enzyme on the front end and xUnit on the back end',
       'Upkept automation tests in Selenium and Cucumber.io',
-      'Conducted interviews, started the company football team, and ran the brown bags club',
+      'Conducted interviews, started the company football team, and ran the brown bag talks',
     ],
   },
   {
@@ -79,6 +95,13 @@ const projects = [
     imagePosition: 'side',
   },
   {
+    title: 'Audit Tracks',
+    description: 'Side project to see if mountain bike tracks in Queenstown can be audited off Garmin data alone',
+    tags: ['React'],
+    href: 'https://jordanelley.github.io/mtb-garmin-data-demo/',
+    image: garminImage,
+  },
+  {
     title: 'Pokeordle',
     description: 'Made it around the time wordle came out.  Its a daily guess the pokemon using the public free PokeAPI. The colour scheme is terrible so please use it in a browser that forces a dark theme',
     tags: ['React'],
@@ -90,7 +113,7 @@ const projects = [
     description: 'I got really into making \'difficult to use\' websites and sign up pages over lockdown and ended up with some popular social medias.  Received many awards on Reddit in r/badUIbattles' ,
     tags: ['React', 'Angular'],
     href: '#',
-    image: badUiImage,
+    image: [badUiImage, badUiImage2],
     imagePosition: 'side',
   },
 ]
@@ -134,94 +157,6 @@ function ExperienceItem({ job }) {
         </ul>
       </div>
       {job.logo && <img src={job.logo} alt={`${job.company} logo`} className="experience-logo" />}
-    </div>
-  )
-}
-
-function WordArtTitle({ text }) {
-  const fontSize = 90
-  const vbWidth = Math.max(420, text.length * fontSize * 0.62 + 60)
-  const vbHeight = 170
-  const cx = vbWidth / 2
-  const cy = 85
-  const gradientId = `wordart-gradient-${text.replace(/\s+/g, '-')}`
-
-  return (
-    <svg
-      className="wordart-title"
-      viewBox={`0 0 ${vbWidth} ${vbHeight}`}
-      overflow="visible"
-      role="img"
-      aria-label={text}
-    >
-      <defs>
-        <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#ffe066" />
-          <stop offset="45%" stopColor="#ffb627" />
-          <stop offset="100%" stopColor="#ff7a1a" />
-        </linearGradient>
-      </defs>
-      <g transform={`rotate(-10 ${cx} ${cy})`}>
-        <text
-          x={cx + 7}
-          y="107"
-          textAnchor="middle"
-          fontFamily="Impact, 'Arial Black', sans-serif"
-          fontSize={fontSize}
-          fontWeight="900"
-          fill="#5c1f0d"
-        >
-          {text}
-        </text>
-        <text
-          x={cx}
-          y="100"
-          textAnchor="middle"
-          fontFamily="Impact, 'Arial Black', sans-serif"
-          fontSize={fontSize}
-          fontWeight="900"
-          fill={`url(#${gradientId})`}
-        >
-          {text}
-        </text>
-      </g>
-    </svg>
-  )
-}
-
-function getFizzBuzzResult(rawValue) {
-  const trimmed = rawValue.trim()
-  if (trimmed === '') return null
-  const num = Number(trimmed)
-  if (!Number.isFinite(num)) return 'Invalid'
-  if (num % 15 === 0) return 'FizzBuzz'
-  if (num % 3 === 0) return 'Fizz'
-  if (num % 5 === 0) return 'Buzz'
-  return String(num)
-}
-
-function FizzBuzzBox() {
-  const [value, setValue] = useState('')
-  const result = getFizzBuzzResult(value)
-  const resultClass =
-    result === 'Invalid'
-      ? 'fizzbuzz-invalid'
-      : result === 'Fizz' || result === 'Buzz' || result === 'FizzBuzz'
-        ? 'fizzbuzz-hit'
-        : 'fizzbuzz-number'
-
-  return (
-    <div className="fizzbuzz">
-      <input
-        type="text"
-        inputMode="numeric"
-        placeholder="Enter a number"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        className="fizzbuzz-input"
-        aria-label="Enter a number for FizzBuzz"
-      />
-      <p className={`fizzbuzz-result ${resultClass}`}>{result ?? ' '}</p>
     </div>
   )
 }
@@ -322,24 +257,36 @@ function App() {
                   </ul>
                 </div>
               )
-              const alt = `${project.title} banner`
-              const openLightbox = (e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                setLightboxImage({ src: project.image, alt })
-              }
-              const image = project.image && (
-                <img
-                  src={project.image}
-                  alt={alt}
-                  className={`project-image${imageOnSide ? ' project-image-side' : ''}`}
-                  role="button"
-                  tabIndex={0}
-                  onClick={openLightbox}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') openLightbox(e)
-                  }}
-                />
+              const images = Array.isArray(project.image)
+                ? project.image
+                : project.image
+                  ? [project.image]
+                  : []
+              const image = images.length > 0 && (
+                <div className={`project-images${imageOnSide ? ' project-images-side' : ''}`}>
+                  {images.map((src, i) => {
+                    const alt = `${project.title} banner${images.length > 1 ? ` ${i + 1}` : ''}`
+                    const openLightbox = (e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      setLightboxImage({ src, alt })
+                    }
+                    return (
+                      <img
+                        key={src}
+                        src={src}
+                        alt={alt}
+                        className={`project-image${imageOnSide ? ' project-image-side' : ''}`}
+                        role="button"
+                        tabIndex={0}
+                        onClick={openLightbox}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') openLightbox(e)
+                        }}
+                      />
+                    )
+                  })}
+                </div>
               )
 
               return (
