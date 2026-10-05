@@ -1,0 +1,109 @@
+.code-typer {
+  width: 320px;
+  max-width: 100%;
+  flex-shrink: 0;
+
+  @media (max-width: 1024px) {
+    width: 280px;
+  }
+
+  @media (max-width: 640px) {
+    width: 100%;
+  }
+}
+
+.code-typer-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.code-typer-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.code-typer-dot-red {
+  background: #ff5f56;
+}
+
+.code-typer-dot-yellow {
+  background: #ffbd2e;
+}
+
+.code-typer-dot-green {
+  background: #27c93f;
+}
+
+.code-typer-filename {
+  margin-left: 8px;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.code-typer-body {
+  margin: 0;
+  padding: 16px;
+  font: 13px/1.6 var(--mono);
+  color: var(--text);
+  min-height: 380px;
+  white-space: pre;
+}
+
+.code-line {
+  white-space: pre;
+}
+
+.code-kw {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.code-str {
+  color: #ffb627;
+}
+
+.code-num {
+  color: #7dd3fc;
+}
+
+.code-fn {
+  color: #7dd3fc;
+}
+
+.code-var {
+  color: var(--text-h);
+}
+
+.code-typer-cursor {
+  display: inline-block;
+  width: 7px;
+  height: 14px;
+  margin-left: 1px;
+  background: var(--accent);
+  vertical-align: text-bottom;
+  animation: code-typer-blink 0.9s step-end infinite;
+}
+
+.code-typer-cursor-done {
+  animation: none;
+  opacity: 1;
+}
+
+@keyframes code-typer-blink {
+  0%, 49% {
+    opacity: 1;
+  }
+  50%, 100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .code-typer-cursor {
+    animation: none;
+  }
+}

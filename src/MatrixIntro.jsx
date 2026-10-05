@@ -3,10 +3,10 @@ import './MatrixIntro.css'
 
 const CHARSET =
   'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789'
-const LOCK_CHANCE = 0.4
-const RESET_CHANCE = 0.02
-const HOLD_MS = 900
-const FADE_MS = 600 // keep in sync with .matrix-intro-fade transition duration
+const REVEAL_MS = 1500
+const HOLD_MS = 200
+const FADE_MS = 300 // keep in sync with .matrix-intro-fade transition duration
+// REVEAL_MS + HOLD_MS + FADE_MS should total the desired intro length (2000ms)
 
 function randomChar() {
   return CHARSET[Math.floor(Math.random() * CHARSET.length)]
@@ -24,18 +24,47 @@ function MatrixIntro({ name, onComplete }) {
 
     const canvas = canvasRef.current
     const ctx = canvas.getContext('2d')
-    const word = name.toUpperCase()
+    const word = name
+    const startTime = performance.now()
+    const bgColor = getComputedStyle(document.documentElement)
+      .getPropertyValue('--bg')
+      .trim()
+    const heroH1 = document.querySelector('.hero h1')
+
+    // rank of each non-space character in reveal order; -1 for spaces
+    let rank = 0
+    const letterRanks = word.split('').map((char) => (char === ' ' ? -1 : rank++))
+    const totalLetters = rank
 
     let squareSize
     let columnCount
     let dropRows
-    let filledLetters
-    let wordStartCol
-    let wordRow
     let frameId
-    let holdTimeout
-    let fadeTimeout
-    let finished = false
+
+    // Position/size the revealed name to exactly match the real <h1> on the page,
+    // which is already mounted (just hidden behind this overlay).
+    let target = { x: 32, y: 32, font: 'bold 56px sans-serif', letterSpacing: 0, color: '#00ff99' }
+    let letterX = []
+
+    const measureTarget = () => {
+      if (!heroH1) return
+      const rect = heroH1.getBoundingClientRect()
+      const cs = getComputedStyle(heroH1)
+      target = {
+        x: rect.left,
+        y: rect.top + rect.height / 2,
+        font: `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`,
+        letterSpacing: parseFloat(cs.letterSpacing) || 0,
+        color: cs.color,
+      }
+      ctx.font = target.font
+      let cx = target.x
+      letterX = word.split('').map((char) => {
+        const x = cx
+        cx += ctx.measureText(char).width + target.letterSpacing
+        return x
+      })
+    }
 
     const setup = () => {
       const dpr = window.devicePixelRatio || 1
@@ -52,65 +81,51 @@ function MatrixIntro({ name, onComplete }) {
         -Math.floor(Math.random() * 40)
       )
 
-      filledLetters = word.split('').map((char) => char === ' ')
-      wordStartCol = Math.max(
-        0,
-        Math.round((columnCount - word.length) / 2)
-      )
-      wordRow = Math.round(h / squareSize / 2)
+      measureTarget()
     }
 
     setup()
 
+    let resizeTimer
     const handleResize = () => {
-      if (!finished) setup()
+      clearTimeout(resizeTimer)
+      resizeTimer = setTimeout(setup, 200)
     }
     window.addEventListener('resize', handleResize)
 
     const draw = () => {
       const { innerWidth: w, innerHeight: h } = window
+      const elapsed = performance.now() - startTime
+      const revealedCount = Math.min(
+        totalLetters,
+        Math.ceil((elapsed / REVEAL_MS) * totalLetters)
+      )
 
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.08)'
+      ctx.globalAlpha = 0.2
+      ctx.fillStyle = bgColor
       ctx.fillRect(0, 0, w, h)
+      ctx.globalAlpha = 1
       ctx.font = `${squareSize}px monospace`
       ctx.fillStyle = '#9fffb0'
+      ctx.textBaseline = 'top'
 
       for (let col = 0; col < columnCount; col++) {
         const row = dropRows[col]
         const y = row * squareSize
-        const wordIndex = col - wordStartCol
-        const onWordRow =
-          row === wordRow && wordIndex >= 0 && wordIndex < word.length
-
-        if (onWordRow && !filledLetters[wordIndex] && Math.random() < LOCK_CHANCE) {
-          filledLetters[wordIndex] = true
-        }
-
         if (y > -squareSize && y < h) {
           ctx.fillText(randomChar(), col * squareSize, y)
         }
-
         dropRows[col] = row + 1
-        if (y > h && Math.random() < RESET_CHANCE) {
-          dropRows[col] = -Math.floor(Math.random() * 20)
-        }
       }
 
-      ctx.font = `bold ${squareSize}px monospace`
-      ctx.fillStyle = '#39ff14'
+      ctx.font = target.font
+      ctx.fillStyle = target.color
+      ctx.textBaseline = 'middle'
       word.split('').forEach((char, i) => {
-        if (filledLetters[i]) {
-          ctx.fillText(char, (wordStartCol + i) * squareSize, wordRow * squareSize)
+        if (letterRanks[i] >= 0 && letterRanks[i] < revealedCount) {
+          ctx.fillText(char, letterX[i], target.y)
         }
       })
-
-      if (!finished && filledLetters.every(Boolean)) {
-        finished = true
-        holdTimeout = setTimeout(() => {
-          setFadingOut(true)
-          fadeTimeout = setTimeout(onComplete, FADE_MS)
-        }, HOLD_MS)
-      }
 
       frameId = requestAnimationFrame(draw)
     }
@@ -118,10 +133,18 @@ function MatrixIntro({ name, onComplete }) {
     document.body.style.overflow = 'hidden'
     frameId = requestAnimationFrame(draw)
 
+    // Scheduled on a wall-clock timer rather than gated by frame/animation state,
+    // so the intro always finishes in REVEAL_MS + HOLD_MS + FADE_MS even if rAF is throttled.
+    const holdTimeout = setTimeout(() => {
+      setFadingOut(true)
+    }, REVEAL_MS + HOLD_MS)
+    const fadeTimeout = setTimeout(onComplete, REVEAL_MS + HOLD_MS + FADE_MS)
+
     return () => {
       cancelAnimationFrame(frameId)
       clearTimeout(holdTimeout)
       clearTimeout(fadeTimeout)
+      clearTimeout(resizeTimer)
       window.removeEventListener('resize', handleResize)
       document.body.style.overflow = ''
     }
